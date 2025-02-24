@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeatherSphere Pro - Intelligent Weather Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/theme.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
+   
+    <meta name="theme-color" content="#2196F3">
+</head>
+<body>
+    <div class="container">
+        <!-- Theme Switcher -->
+        <div class="theme-switcher">
+            <button onclick="ThemeManager.toggleTheme()" aria-label="Toggle theme">
+                <i class="wi wi-day-sunny light-icon"></i>
+                <i class="wi wi-night-clear dark-icon"></i>
+            </button>
+        </div>
+
+        <!-- Error Handling -->
+        <div class="error-banner" id="errorBanner"></div>
+
+        <!-- Unit Conversion -->
+        <div class="unit-toggle">
+            <label class="switch">
+                <input type="checkbox" id="unitToggle">
+                <span class="slider"></span>
+                <span class="units">°C / °F</span>
+            </label>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" 
+                       id="cityInput" 
+                       placeholder="Enter city name"
+                       aria-label="City search input" 
+                       autocomplete="off">
+                <div class="search-buttons">
+                    <button class="icon-btn search-btn" 
+                            onclick="WeatherApp.searchWeather()"
+                            aria-label="Search weather">
+                        <i class="wi wi-search"></i>
+                    </button>
+                    <button class="icon-btn gps-btn" 
+                            onclick="WeatherApp.getLocation()"
+                            aria-label="Use current location">
+                        <i class="wi wi-gps"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div class="loading-spinner" id="loadingSpinner"></div>
+
+        <!-- Main Weather Card -->
+        <div class="weather-card" id="weatherCard">
+            <!-- Current Weather Section -->
+            <div class="current-weather">
+                <div class="location-header">
+                    <h1 id="cityName">--</h1>
+                    <div class="datetime" id="currentDateTime"></div>
+                </div>
+                <div class="weather-main">
+                    <i id="weatherIcon" class="weather-icon wi wi-day-sunny"></i>
+                    <div class="temperature-container">
+                        <span id="temp" class="temperature">--</span>
+                        <div id="weatherDescription" class="weather-condition">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="weather-stats">
+                <div class="stat-card">
+                    <i class="wi wi-thermometer"></i>
+                    <div class="stat-value"><span id="feelsLike">--</span></div>
+                    <div class="stat-label">Feels Like</div>
+                </div>
+                <div class="stat-card">
+                    <i class="wi wi-humidity"></i>
+                    <div class="stat-value"><span id="humidity">--</span>%</div>
+                    <div class="stat-label">Humidity</div>
+                </div>
+                <div class="stat-card">
+                    <i class="wi wi-strong-wind"></i>
+                    <div class="stat-value"><span id="wind">--</span></div>
+                    <div class="stat-label">Wind</div>
+                </div>
+            </div>
+
+            <!-- Visualization Section -->
+            <div class="visualization-section">
+                <div class="map-container" id="weatherMap"></div>
+                <div class="chart-container">
+                    <canvas id="hourlyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Additional Weather Data -->
+            <div class="additional-metrics">
+                <div class="metric-card">
+                    <i class="wi wi-barometer"></i>
+                    <div class="metric-value"><span id="pressure">--</span> hPa</div>
+                    <div class="metric-label">Pressure</div>
+                </div>
+                <div class="metric-card">
+                    <i class="wi wi-raindrop"></i>
+                    <div class="metric-value"><span id="visibility">--</span></div>
+                    <div class="metric-label">Visibility</div>
+                </div>
+                <div class="metric-card">
+                    <i class="wi wi-sunrise"></i>
+                    <div class="metric-value"><span id="sunrise">--</span></div>
+                    <div class="metric-label">Sunrise</div>
+                </div>
+                <div class="metric-card">
+                    <i class="wi wi-sunset"></i>
+                    <div class="metric-value"><span id="sunset">--</span></div>
+                    <div class="metric-label">Sunset</div>
+                </div>
+            </div>
+
+            <!-- 5-Day Forecast Section -->
+            <div class="forecast-section">
+                <h3>5-Day Forecast</h3>
+                <div class="forecast-cards" id="fiveDayForecast"></div>
+            </div>
+            <!-- Social Sharing -->
+            <div class="share-container">
+                <button class="share-btn" onclick="WeatherApp.shareWeather()">
+                    <i class="wi wi-share"></i> Share Weather Report
+                </button>
+            </div>
+        </div>
+
+
+        
+        <!-- Offline Support -->
+        <div class="offline-fallback" id="offlineFallback">
+            <div class="offline-content">
+                <img src="assets/images/offline.svg" alt="Offline" class="offline-image">
+                <p class="offline-message">No internet connection. Showing cached data.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="scripts/touch-events.js"></script>
+    <script src="scripts/theme.js"></script>
+    <script src="scripts/map.js"></script>
+    <script src="scripts/charts.js"></script>
+    <script src="scripts/app.js"></script>
+    <script src="search.js"></script>
+</body>
+</html>
